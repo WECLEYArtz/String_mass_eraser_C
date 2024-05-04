@@ -28,7 +28,6 @@ int main(){
 }
 
 
-
 void delete( char* to_erase_string, char* string, char* result){
 
   int end = strlen(string) - strlen(to_erase_string)+1;//calculate when there is no need to check for word anymore
