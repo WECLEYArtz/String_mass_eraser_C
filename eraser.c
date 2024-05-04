@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 
+
 #define safe_size 1000
 // this is a test
 
@@ -81,7 +82,7 @@ void delete( char* to_erase_string, char* string, char* result){
 
     //fuel  = delet_pose-1;
 
-    fuel -=1;//solves the word missing issue like a pussy lol
+    fuel -=1;//solves the word missing issue like a pussy lmao
   }
 
 }
