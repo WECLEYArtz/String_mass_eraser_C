@@ -7,8 +7,13 @@
 // this is a test
 
 
+//functions inisialisation
+int spaces_clear( char* string,int fuel , int* tlenXpand);
 void input_request(char* to_erase_string, char* string);
 void delete( char* to_erase_string, char* string, char* result);
+void printpoint(char* string,int position);
+void shoving(char* string, int end, int to_erase_pose, int tlen, int tlenXpand);
+ 
 
 
 int main(){
@@ -18,75 +23,57 @@ int main(){
 
   input_request(to_erase_string, string);
 
-  char result[strlen(string)]; // inisealise char for result string
+  char result[safe_size]; // inisealise char for result string
 
   //function
   delete( to_erase_string, string, result ); //delete to_erase_string in string
+
   printf("\nNew string :  (%s)\n\n press something to GTFO" , string); //result
-
-
 
 
   scanf("%d"); //exiting request
 }
 
-
-void input_request(char* to_erase_string, char* string){
-  printf("\nString to expugage:");
-  fgets( string, safe_size,  stdin);
-  printf("\nWord to delet:");
-  scanf("%s", to_erase_string);
-}
-
-
-
 void delete( char* to_erase_string, char* string, char* result){
 
-  int end = strlen(string) - strlen(to_erase_string)+1;//calculate when there is no need to check for word anymore, end is as a string_end
-
-
+  int end = strlen(string) - strlen(to_erase_string)+1;
+  //calculate when there is no need to check for word anymore, end is as a string_end
   int tlen = strlen(to_erase_string);
+  int tlenXpand =0;
   //this to determine where the deleting proccess happens, does get modified
   //t(arget)len
 
-  int delet_pose; //to reset "fuel" back
-  int to_erase_pose;//for erasing process
+  int delet_pose;     //to reset "fuel" back
+  int to_erase_pose;  //for erasing process
 
   //the analyser for a target existance by moving trough characters of string
   //i think i've been hardcoding strcmp()
 
 
-//string          = me when the when the (20)
-//checker         =    ^
-
-//fuel  position  =    ^
-
-
-//to_erase_string = when (4)
-//fuel2 position  =  ^
-
-//fuel  = 3
-//fuel2 = 1
-//fuel3 = 
-//end   = 16 
-
 
   for (int fuel = 0; fuel < end ; fuel++ ) //fuel is basically the position of the letter to compare, called fuel for rounds
   {
-      //printf( " %d," , fuel);
     //blocking the function until there is a similarity between the letter of the to-earse word and string
-    if ( string[ fuel ] != to_erase_string[0] ){continue;}
+    if ( string[ fuel ] != to_erase_string[0] ){continue;} //locked door
 
-    //verifying the rest of the chatracters and deciding to continue or not
+    //door unlocked, verifying the rest of the chatracters and deciding to continue or not
+    printf("Left door at: \"%c\"", string[fuel]);
+    printpoint(string, fuel);
     bool loop_continue = false;
+
 
     //the whole new loop process that uses fuel2 is to start checking the similarity of the rest of the target word
     for (int fuel2 =1 ; fuel2 <tlen ; fuel2++)// to comment
     {
       //fuel and fuel2 usae to keep track of the position for both strings syncothinicazicly
-      //fuek + fuek2 cz fuel has to be increase, we don't need to check the same character that triggered similarity check
+
+      //fuel + fuel2 cz fuel has to be increase, we don't need to check the same character that triggered similarity check
       if (string[fuel + fuel2] != to_erase_string[fuel2] ){
-        printf("\n   loop breaks in : %d/%d", fuel2 , tlen-1);
+
+        //DEBUG_____
+        printf("\nloop breaks in : %d/%d", fuel2 , tlen-1);
+        //DEBUG
+
         loop_continue = true;//will triger if character isn't same
         break;
         }
@@ -98,23 +85,64 @@ void delete( char* to_erase_string, char* string, char* result){
     if ( loop_continue ){printf(" ° DEBUG : delet canceled\n"); continue;}
     //willl execute incase a word turned out not to be the target
 
-    to_erase_pose = fuel;//which will keep getting modified, i will land still on the first character of the word
-    int to_move_pose = to_erase_pose + tlen;//the position where characters will be dragged
+    to_erase_pose = spaces_clear(string,fuel,&tlenXpand);
+    //the position where characters will be dragged
+    int arrowposition = to_erase_pose;
 
-    //printf("  Dbug: updated to_erase_pose to (%d), i is currently (%d) ", to_erase_pose, i );
+//DEBUG______
+    printf("Starting shoving at:");
+    printpoint(string,fuel);
+//DEBUG
 
-    //double space clearance
-        if ( isspace( string[to_erase_pose - 1] )) { to_erase_pose--;}
+    //deleting/shifting to right
+    shoving(string,end,to_erase_pose,tlen,tlenXpand);
 
-    //deleting/shifting
-    for ( int fuel3 = end; fuel3 >0; fuel3--, to_erase_pose++, to_move_pose++)
+//DEBUG_________
+    printf("Current array:");
+    printpoint(string,fuel);
+//DEBUG
+
+    fuel--;//solves the word missing issue like a pussy lmao
+    tlenXpand=0;
+  }
+}
+
+void shoving(char* string, int end, int to_erase_pose, int tlen, int tlenXpand){
+  for ( int fuel3 = end; fuel3 >0; fuel3--, to_erase_pose++)
     {
-
-      string[ to_erase_pose ] = string[ to_move_pose ];
-
+      //printf("DEBUG : replacing %c with %c\n", string[ to_erase_pose ] , string[ to_erase_pose + tlen ]);
+      string[ to_erase_pose ] = string[ to_erase_pose + tlen + tlenXpand ]; //for target lenght expend
     }
+}
 
-    fuel -=1;//solves the word missing issue like a pussy lmao
+void input_request(char* to_erase_string, char* string){
+  printf("\nString to expugage:");
+  fgets( string, safe_size,  stdin);
+
+  if(string[strlen(string)-1] == '\n'){
+    string[strlen(string)-1] = ' ';
   }
 
+  printf("\nWord to delet:");
+  scanf("%s", to_erase_string);
+}
+
+
+int spaces_clear( char* string, int fuel,int* tlenXpand ){
+  int to_erase_pose = fuel;
+  if ( isspace( string[fuel-1])) { (to_erase_pose)--, (*tlenXpand)++;
+  printf("DEBUG : going backwards\n");}
+
+  return to_erase_pose;
+  //the position where the shoving starts goes one position backwards
+}
+
+
+void printpoint(char* string,int position){
+  printf("\n|%s", string);
+  printf("\n|");
+  for(int i =0; i<position; i++ ){
+  printf(" ");
+  }
+  printf("^\n|position: %d\n", position);
 }
